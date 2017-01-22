@@ -1,0 +1,12 @@
+- name: disable password ask for sudo users
+  lineinfile: "dest=/etc/sudoers regexp='^%sudo' line='%sudo ALL=(ALL) NOPASSWD: ALL'"
+
+- name: add {{ name }}
+  user: name={{ name }} shell=/bin/bash state=present groups={{ 'sudo' if user_sudo else '' }} append=yes
+
+- name: set {{ name }} password
+  user: name={{ name }} password={{ password }}
+  when: password is defined
+
+- name: put ssh key for user
+  authorized_key: user={{ name }} key="{{ ssh_public_key }}"
